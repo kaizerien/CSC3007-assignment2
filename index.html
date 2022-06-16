@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html lang="en">
+    <head>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <!-- <script src="script.js"></script> -->
+        <link rel="stylesheet" href="style.css" />
+        <meta charset="UTF-8" />
+        <title>Assignment 2</title>
+    </head>
+    <body>
+        <!-- Here a loader is created which 
+             loads till response comes -->
+        <div class="d-flex justify-content-center">
+            <div class="spinner-border" 
+                 role="status" id="loading">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        <h1>Crime Rate in Singapore</h1>
+        <div>
+            <select  onchange="yearSelected()" style = "text-align: center"  name="dropdown" id="dropdown">
+                <option value="year">Year</option>
+            </select>
+        </div>
+        <div id="my_graph"></div>
+    </body>
+</html>
+<script>
+// api url
+const api_url = "https://data.gov.sg/api/action/datastore_search?resource_id=83c21090-bd19-4b54-ab6b-d999c251edcf";
+var data
+var colour = d3.scaleOrdinal().range(['#fff100','#ff8c00','#e81123','#ec008c','#68217a','#00188f','#00bcf2','#00b294','#009e49','#bad80a'])
+var div = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
+
+function hideloader() {
+    document.getElementById('loading').style.display = 'none';
+}
+// set the dimensions and margins of the graph
+d3.json(api_url).then(function(dataRaw) {
+    data = d3.group(dataRaw.result.records, d => d.year)
+    var dropdown = document.getElementById("dropdown");
+    for (const item of data.keys()) {
+        var option = document.createElement("option");
+        option.value = item.toString();
+        option.text = item.toString();
+        dropdown.add(option);
+    }
+    hideloader();
+    update(data,"2011")
+})
+
+const margin = {top: 30, right: 30, bottom: 70, left: 60},
+width = 1000 - margin.left - margin.right,
+height = 500 - margin.top - margin.bottom;
+
+
+    
+// append the svg object to the body of the page
+const svg = d3.select("#my_graph")
+  .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+// Initialize the X axis
+const x = d3.scaleBand()
+  .range([ 0, width ])
+  .padding(0.2);
+const xAxis = svg.append("g")
+  .attr("transform", `translate(0,${height})`)
+
+// Initialize the Y axis
+const y = d3.scaleLinear()
+  .range([ height, 0]);
+const yAxis = svg.append("g")
+  .attr("class", "myYaxis")
+
+
+function update(data, year) {
+
+    // Update the X axis
+    x.domain(data.get(year).map(d =>d.level_2))
+    console.log(data.get(year).map(d =>d.level_2))
+    xAxis.call(d3.axisBottom(x))
+
+    // Update the Y axis
+    y.domain([0, d3.max(data.get(year), d=> d.value) ]);
+    console.log([0, d3.max(data.get(year), d=> d.value) ])
+    yAxis.transition().duration(1000).call(d3.axisLeft(y));
+
+    // Create the u variable
+    var u = svg.selectAll("rect").data(data.get(year))
+    u
+    .join("rect") // Add a new rect for each new elements
+    .attr("x", d => x(d.level_2))
+    .attr("y", d => y(d.value))
+    .attr("width", x.bandwidth())
+    .attr("height", d => height - y(d.value))
+    .attr("fill", d => colour(d))
+    .on('mouseover', function (event,d) {
+        d3.select(this).transition()
+        .duration('50')
+        .attr('opacity', '.5');
+        div.transition()
+        .duration(50)
+        .style("opacity", 1);
+        let tipString = d.value
+        div.html(tipString)
+            .style("left", (event.pageX + 10) + "px")
+            .style("top", (event.pageY - 15) + "px"); })
+    .on('mouseout', function (d, i) {
+        d3.select(this).transition()
+        .duration('50')
+        .attr('opacity', '1');
+        div.transition()
+        .duration('50')
+        .style("opacity", 0);});
+}
+
+function yearSelected() {
+    var x = document.getElementById("dropdown").value;
+    // console.log("selected ", x);
+
+    if (x === "Year") {
+        return;
+    } else {
+        // console.log("updating graph with year", x);
+        update(data, x);
+    }
+}
+</script>

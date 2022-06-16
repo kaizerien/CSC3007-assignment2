@@ -1,0 +1,15 @@
+h1{
+    text-align: center;
+}
+#my_graph{
+    text-align: center;
+}
+div{
+    text-align: center;
+}
+div.tooltip {
+    position: absolute;
+    text-align: center;
+    border-style: ridge;
+    pointer-events: none;
+}
