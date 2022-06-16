@@ -3,6 +3,7 @@ h1{
 }
 #my_graph{
     text-align: center;
+    background-color: whitesmoke;
 }
 div{
     text-align: center;
@@ -10,6 +11,8 @@ div{
 div.tooltip {
     position: absolute;
     text-align: center;
-    border-style: ridge;
     pointer-events: none;
+    background-color: darkslategrey;
+    color:white;
+    border-left: 5px solid white;
 }
