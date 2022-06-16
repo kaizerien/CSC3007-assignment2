@@ -81,12 +81,10 @@ function update(data, year) {
 
     // Update the X axis
     x.domain(data.get(year).map(d =>d.level_2))
-    console.log(data.get(year).map(d =>d.level_2))
     xAxis.call(d3.axisBottom(x))
 
     // Update the Y axis
-    y.domain([0, d3.max(data.get(year), d=> d.value) ]);
-    console.log([0, d3.max(data.get(year), d=> d.value) ])
+    y.domain([0, d3.max(data.get(year), d=> Number(d.value)) ]);
     yAxis.transition().duration(1000).call(d3.axisLeft(y));
 
     // Create the u variable
@@ -107,8 +105,8 @@ function update(data, year) {
         .style("opacity", 1);
         let tipString = d.value
         div.html(tipString)
-            .style("left", (event.pageX + 10) + "px")
-            .style("top", (event.pageY - 15) + "px"); })
+        .style("left", (event.pageX + 10) + "px")
+        .style("top", (event.pageY - 15) + "px"); })
     .on('mouseout', function (d, i) {
         d3.select(this).transition()
         .duration('50')
