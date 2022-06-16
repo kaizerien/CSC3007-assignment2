@@ -51,8 +51,6 @@ d3.json(api_url).then(function(dataRaw) {
 const margin = {top: 30, right: 30, bottom: 70, left: 60},
 width = 1000 - margin.left - margin.right,
 height = 500 - margin.top - margin.bottom;
-
-
     
 // append the svg object to the body of the page
 const svg = d3.select("#my_graph")
@@ -61,6 +59,7 @@ const svg = d3.select("#my_graph")
     .attr("height", height + margin.top + margin.bottom)
   .append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
+
 // Initialize the X axis
 const x = d3.scaleBand()
   .range([ 0, width ])
@@ -116,13 +115,6 @@ function update(data, year) {
 
 function yearSelected() {
     var x = document.getElementById("dropdown").value;
-    // console.log("selected ", x);
-
-    if (x === "Year") {
-        return;
-    } else {
-        // console.log("updating graph with year", x);
-        update(data, x);
-    }
+    update(data, x);
 }
 </script>
